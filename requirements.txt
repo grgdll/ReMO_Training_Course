@@ -4,3 +4,12 @@ pandas==1.4.4
 matplotlib==3.6.2
 hvplot==0.8.2
 cmocean==2.0
+gsw==3.6.16
+matplotlib==3.6.2
+copy
+sys
+numba==0.56.3
+cartopy==0.21.0
+ipdb
+statsmodels==0.13.5
+
