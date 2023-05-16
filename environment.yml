@@ -1,0 +1,17 @@
+name: grg
+channels:
+  - pyviz
+  - conda-forge
+  - https://repo.anaconda.com/pkgs/main/osx-arm64/
+  - defaults
+dependencies:
+  - cartopy=0.21.0=py39h5c53a9d_2
+  - gsw=3.6.16=py39h4d8bf0d_4
+  - hvplot=0.8.2=py39hca03da5_0
+  - matplotlib=3.6.2=py39hdf13c20_0
+  - numpy=1.23.4=py39h1398885_0
+  - pandas=1.4.4=py39hc377ac9_0
+  - xarray=2022.11.0=py39hca03da5_0
+  - cmocean==2.0
+  - statsmodels=0.13.5=py39h4d8bf0d_2 
+    
