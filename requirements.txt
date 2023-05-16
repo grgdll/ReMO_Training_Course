@@ -7,6 +7,5 @@ cmocean==2.0
 gsw==3.6.16
 matplotlib==3.6.2
 cartopy==0.21.0
-pdb
 statsmodels==0.13.5
 
