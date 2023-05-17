@@ -1,4 +1,4 @@
-name: grg
+name: R_training
 channels:
   - pyviz
   - conda-forge
