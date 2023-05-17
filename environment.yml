@@ -14,4 +14,6 @@ dependencies:
   - xarray=2022.11.0
   - cmocean==2.0
   - statsmodels=0.13.5
-    
+  - h5netcdf=1.0.2   
+  - libnetcdf=4.8.1
+  - netcdf4=1.6.1
