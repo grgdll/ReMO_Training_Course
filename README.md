@@ -20,3 +20,5 @@ The file `environment.yml` allows you to recreate the conda environment needed f
 To create the `R_training` environment use the command `conda env create -f environment.yml`. See also [here](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file) for more detailed instructions on how to create a conda environment from a yml file.
 
 Then the newly created conda environment needs to be activated using `conda activate R_training`.
+
+Finally, to start the notebook, type this command on your terminal: `jupyter notebook cmp_respiration_ReMO.ipynb`
