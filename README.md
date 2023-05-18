@@ -16,7 +16,7 @@ ReMO_Training_Course-main/
 
 The file `environment.yml` allows you to recreate the conda environment (i.e., Python and related libraries) needed for the notebook to work. If you do not have conda installed, first follow [these instructions](https://conda.io/projects/conda/en/latest/user-guide/install/index.html). 
 
-To create the `R_training` environment open a terminal (for Windows users, please use the "Anaconda Powershell Prompt") and type this command: `conda env create -f environment.yml`. See also [here](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file) for more detailed instructions on how to create a conda environment from a yml file. This command will download and install the correct version of Python and the libraires needed to run the notebook: please be patient, it may take a relatively long time. 
+To create the `R_training` environment open a terminal (for Windows users, please use the "Anaconda Powershell Prompt"), move to the `ReMO_Training_Course-main` directory (i.e., use command `cd` followed by the desired path) and type this command: `conda env create -f environment.yml`. See also [here](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file) for more detailed instructions on how to create a conda environment from a yml file. This command will download and install the correct version of Python and the libraires needed to run the notebook: please be patient, it may take a relatively long time. 
 
 Then, you need to activate the new conda environment. From the terminal type this command: `conda activate R_training`
 
