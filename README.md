@@ -6,14 +6,14 @@ This notebook demonstrates how to estimate mesopelagic respiration from oxygen d
 To work with these examples you first need to clone this repository. Clone this repository in a new directory (e.g., click here [[https://github.com/grgdll/OLTraj_examples/archive/refs/heads/main.zip](https://github.com/grgdll/ReMO_Training_Course/archive/refs/heads/main.zip)).
 
 Unzipping this file should create on your computer the following directory structure:
-
+<pre>
 ReMO_Training_Course-main/
 ├── environment.yml
 ├── cmp_respiration_ReMO.ipynb
 ├── bgc_tools.py
 ├── README.md
-└── 1LICENSE
-
+└── LICENSE
+</pre>
 
 The file environment.yml allows you to recreate the conda environment needed for the notebooks to work. If you do not have conda installed, follow the instructions here: [https://docs.conda.io/projects/conda/en/latest/user-guide/install/](https://conda.io/projects/conda/en/latest/user-guide/install/index.html).
 
