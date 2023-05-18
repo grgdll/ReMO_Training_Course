@@ -3,7 +3,7 @@
 
 This notebook demonstrates how to estimate mesopelagic respiration from oxygen data collected by BGC-Argo floats.
 
-To work with these examples you first need to clone this repository. Clone this repository in a new directory (e.g., click [here] [https://github.com/grgdll/OLTraj_examples/archive/refs/heads/main.zip]).
+To work with these examples you first need to clone this repository. Clone this repository in a new directory (e.g., click (here) [https://github.com/grgdll/OLTraj_examples/archive/refs/heads/main.zip]).
 
 Unzipping this file should create on your computer the following directory structure:
 <pre>
