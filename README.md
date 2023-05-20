@@ -1,4 +1,4 @@
-# ReMO_Training_Course
+# Estimating mesopelagic respiration using BGC-Argo data
 
 This notebook demonstrates how to estimate mesopelagic respiration from oxygen data collected by BGC-Argo floats.
 
