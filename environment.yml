@@ -1,4 +1,4 @@
-name: R_training
+name: grg
 channels:
   - pyviz
   - conda-forge
@@ -17,3 +17,4 @@ dependencies:
   - h5netcdf=1.0.2   
   - libnetcdf=4.8.1
   - netcdf4=1.6.1
+  - numba
