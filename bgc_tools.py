@@ -4,6 +4,7 @@ import xarray as xr
 from matplotlib import pyplot as plt
 import gsw
 import sys
+from numba import jit
 import cartopy.crs as ccrs
 import statsmodels.api as sm
 
@@ -248,13 +249,15 @@ def cmp_zeu(ds):
         return ds
 
     # check if we have ADJUSTED variables
-    if ("CHLA_ADJUSTED" in ds.keys()) & (not np.all(np.isnan(ds.CHLA_ADJUSTED.values))):
-        CHLA = ds.CHLA_ADJUSTED.values
+    if ("CHLA_ADJUSTED" in ds.keys()):
+            if (not np.all(np.isnan(ds.CHLA_ADJUSTED.values))):
+                CHLA = ds.CHLA_ADJUSTED.values
     else:
         CHLA = ds.CHLA.values
 
-    if ('PRES_ADJUSTED' in ds.keys()) & (not np.all(np.isnan(ds.PRES_ADJUSTED.values))):
-        PRES = ds.PRES_ADJUSTED.values
+    if ('PRES_ADJUSTED' in ds.keys()):
+            if(not np.all(np.isnan(ds.PRES_ADJUSTED.values))):
+                PRES = ds.PRES_ADJUSTED.values
     else:
         PRES = ds.PRES.values
 
@@ -459,6 +462,113 @@ def umolO2_kg_d_TO_mmolC_m3_yr(R, R_ERR=False, SIGMA=1027):
 
     else:
         return RC, np.nan
+
+
+# medfilt1 function similar to Octave's that does not bias extremes of dataset towards zero
+@jit(nopython=True)  # this is to use numba to speed up calculations (by a factor 46!)
+def medfilt1(data, kernel_size, endcorrection='shrinkkernel'):
+    """One-dimensional median filter"""
+    halfkernel = int(kernel_size / 2)
+    data = np.asarray(data)
+
+    filtered_data = np.empty(data.shape)
+    filtered_data[:] = np.nan
+
+    for n in range(len(data)):
+        i1 = np.nanmax([0, n - halfkernel])
+        i2 = np.nanmin([len(data), n + halfkernel + 1])
+        filtered_data[n] = np.nanmedian(data[i1:i2])
+
+    return filtered_data
+
+@jit(nopython=True)  # this is to use numba to speed up calculations (by a factor 46!)
+def medfilt1_adp(data, kernel_size, endcorrection='shrinkkernel'):
+        """One-dimensional median filter"""
+        halfkernel = int(kernel_size / 2)
+        data = np.asarray(data)
+
+        filtered_data = np.empty(data.shape)
+        filtered_data[:] = np.nan
+
+        for n in range(len(data)):
+            i1 = np.nanmax([0, n - halfkernel])
+            i2 = np.nanmin([len(data), n + halfkernel + 1])
+            filtered_data[n] = np.nanmedian(data[i1:i2])
+
+        return filtered_data
+
+@jit(nopython=True) # this is to use numba to speed up calculations (by a factor 46!)
+def smooth_profile(x, y):
+
+    # compute x resolution
+    xres = np.diff(x)
+    xres = np.append(xres, xres[-1])  # assumes that the vertical resolution of the deepest bin
+                                     # is the same as the previous one
+
+    # initialise medfiltered array
+    ymf = np.zeros(y.shape) * np.nan
+
+    # ir_LT1 = np.where(xres < 1)[0]
+    # if np.any(ir_LT1):
+    #     win_LT1 = 11.
+    #     ymf[ir_LT1] = medfilt1_adp(y[ir_LT1], win_LT1)
+    #
+    # ir_13 = np.where((xres >= 1) & (xres <= 3))[0]
+    # if np.any(ir_13):
+    #     win_13 = 7.
+    #     ymf[ir_13] = medfilt1_adp(y[ir_13], win_13)
+    #
+    # ir_GT3 = np.where(xres > 3)[0]
+    # if np.any(ir_GT3):
+    #     win_GT3 = 5.
+    #     ymf[ir_GT3] = medfilt1_adp(y[ir_GT3], win_GT3)
+
+
+    # ir_LT1 = np.where(xres < 5)[0]
+    # if np.any(ir_LT1):
+    #     win_LT1 = 11.
+    #     ymf[ir_LT1] = medfilt1_adp(y[ir_LT1], win_LT1)
+    #
+    # ir_13 = np.where((xres >= 5) & (xres < 50))[0]
+    # if np.any(ir_13):
+    #     win_13 = 7.
+    #     ymf[ir_13] = medfilt1_adp(y[ir_13], win_13)
+    #
+    # ir_GT3 = np.where(xres > 50)[0]
+    # if np.any(ir_GT3):
+    #     win_GT3 = 5.
+    #     ymf[ir_GT3] = medfilt1_adp(y[ir_GT3], win_GT3)
+    #
+
+    ir_LT1 = np.where(xres >0)[0]
+    if np.any(ir_LT1):
+        win_LT1 = 11.
+        ymf[ir_LT1] = medfilt1_adp(y[ir_LT1], win_LT1)
+
+
+
+    return ymf
+
+# function to define adaptive median filtering based on Christina Schallemberg's suggestion for CHLA
+def adaptive_medfilt1(xall, yall, PLOT=False):
+    '''
+    applies a median filtering with an adaptive window
+        xall is PRES
+        yall is variable to smooth
+    '''
+
+    # initialize output array
+    filtered_y = yall * np.nan
+
+    # check if the input variable is a vector or a matrix
+    if len(xall.shape) == 2:
+        # loop through all elements assuming the first axis is time
+        for ijuld,yi in enumerate(yall):
+            filtered_y[ijuld,:] = smooth_profile(xall[ijuld,:], yall[ijuld,:])
+    else:
+        filtered_y = smooth_profile(xall, yall)
+
+    return filtered_y
 
 
 
