@@ -654,7 +654,7 @@ def smooth_profile(x, y):
 
     return ymf
 
-# function to define adaptive median filtering based on Christina Schallemberg's suggestion for CHLA
+# function to define adaptive median filtering
 def adaptive_medfilt1(xall, yall, PLOT=False):
     '''
     applies a median filtering with an adaptive window
@@ -675,7 +675,65 @@ def adaptive_medfilt1(xall, yall, PLOT=False):
 
     return filtered_y
 
+def interp_BGCArgo_var(ds, P, NEW_PRES, VARin, FORCE_ADJUSTED=False):
 
+    '''interpolate all profiles of BGCArgo variable from Sprof file to common pressure axis'''
+
+    ### define if we must/can use the ADJUSTED variable
+    if FORCE_ADJUSTED:  # this is when we MUST have an adjusted variable
+        VARin = VARin + "_ADJUSTED"
+        print('using ADJUSTED values for ' + VARin)
+
+    elif (VARin + "_ADJUSTED" in ds.keys()) & ("BBP" not in VARin):  # this is when we see if we have the adjusted
+        VARin = VARin + "_ADJUSTED"
+        print('using ADJUSTED values for ' + VARin)
+
+    else:  # this is when we do not have an adkusrted variable, but we are OK to use the unadjusted
+        print('using un-ADJUSTED values for ' + VARin)
+
+        ### create new variable that will be interpolated
+    if (not np.all(np.isnan(ds[VARin].values))):
+        VAR = ds[VARin].values
+    else:
+        print('   all NaNs in ' + VARin)
+        da_VARi = []
+        return da_VARi
+
+    # initialise array to NaN values for the new interpolated variables
+    VARi = np.empty((ds.JULD.shape[0], NEW_PRES.shape[0])) + np.nan
+
+    i_allNaNs = []
+    for it, tmp in enumerate(ds.JULD.values):  # loop through each date/profile
+
+        if "DOXY" in VARin:
+            # store position of where data are all NaNs
+            if np.all(np.isnan(VAR[it, :])):
+                i_allNaNs.append(it)
+
+        innan = np.where((~np.isnan(P[it, :])) & (~np.isnan(VAR[it, :])))[0]  # find non-NaN values
+        VARtmp = VAR[it, :][innan]  # and create a vector only with real numbers
+        Ptmp = P[it, :][innan]  # and create a vector only with real numbers
+
+        if ~np.all(np.diff(Ptmp) > 0):  # if Ptmp is not monotonically increasing (needed by np.interp), then stop here
+            pdb.set_trace()
+        if (np.all(np.isnan(VARtmp))):  # check if we have only NaNs and, if so, go to the next iteration
+            continue
+
+        VARi[it, :] = np.interp(NEW_PRES, Ptmp, VARtmp)  # interpolate variable to NEW_PRES axis
+
+        ## create the DataArrays that will be part of the dataset
+        da_VARi = xr.DataArray(VARi,
+                               dims=['JULD', 'PRES'],  # note the new dimensions
+                               coords={'JULD': ds.JULD.values,  # note the new coordinates
+                                       'PRES': NEW_PRES
+                                       },
+                               attrs=ds[VARin].attrs
+                               # here I am copying the attributes that contain metadata about the variable (e.g., units) )
+                               )
+    if "DOXY" in VARin:
+        return da_VARi, i_allNaNs
+    else:
+        return da_VARi
 
 
 if __name__ == '__main__':
