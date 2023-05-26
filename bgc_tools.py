@@ -263,7 +263,7 @@ def cmp_zeu(ds):
 
     # smooth CHLA (matrix) using median filter
     ds['CHLA_smooth'] = ds.CHLA.copy(deep=True) * 0. # initialize new array
-    ds['CHLA_smooth'].values = bgc_tools.adaptive_medfilt1(PRES, CHLA)
+    ds['CHLA_smooth'].values = adaptive_medfilt1(PRES, CHLA)
 
     # find zeu for each profile
     for ijuld, CHLA_smooth in enumerate(ds['CHLA_smooth'].values):
