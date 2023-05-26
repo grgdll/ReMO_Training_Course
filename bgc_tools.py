@@ -263,13 +263,13 @@ def cmp_zeu(ds):
 
     # smooth CHLA (matrix) using median filter
     ds['CHLA_smooth'] = ds.CHLA.copy(deep=True) * 0. # initialize new array
-    ds['CHLA_smooth'].values = adaptive_medfilt1(PRES, CHLA)
+    ds['CHLA_smooth'].values = bgc_tools.adaptive_medfilt1(PRES, CHLA)
 
     # find zeu for each profile
     for ijuld, CHLA_smooth in enumerate(ds['CHLA_smooth'].values):
 
         # # find median value of deep (>850 dbar) CHLA
-        i_deep = np.where(PRES[ijuld, :] > 850)[0]
+        i_deep = np.where(PRES > 850)[0]
         CHLA_smooth_deep = np.nanmedian(CHLA_smooth[i_deep])
 
         # from the bottom of the profile search for the first CHLA_smooth (CHLA_ZEU) that is 0.02 mg/m3 higher than the deep CHLA_smooth
@@ -277,7 +277,7 @@ def cmp_zeu(ds):
         if ind.any():
             i_zeu = ind[-1:].flatten()[0]
             # extract the PRES of the above CHLA_ZEU
-            ds['zeu'][ijuld] = PRES[ijuld, i_zeu]
+            ds['zeu'][ijuld] = PRES[i_zeu]
         else:
             ds['zeu'][ijuld] = np.nan
 
