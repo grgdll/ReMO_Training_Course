@@ -568,7 +568,6 @@ def umolO2_kg_d_TO_mmolC_m3_yr(R, R_ERR=False, SIGMA=1027):
     else:
         return RC, np.nan
 
-
 # medfilt1 function similar to Octave's that does not bias extremes of dataset towards zero
 @jit(nopython=True)  # this is to use numba to speed up calculations (by a factor 46!)
 def medfilt1(data, kernel_size, endcorrection='shrinkkernel'):
@@ -688,11 +687,11 @@ def interp_BGCArgo_var(ds, P, NEW_PRES, VARin, FORCE_ADJUSTED=False):
         VARin = VARin + "_ADJUSTED"
         print('using ADJUSTED values for ' + VARin)
 
-    else:  # this is when we do not have an adkusrted variable, but we are OK to use the unadjusted
+    else:  # this is when we do not have an adjusted variable, but we are OK to use the unadjusted
         print('using un-ADJUSTED values for ' + VARin)
 
-        ### create new variable that will be interpolated
-    if (not np.all(np.isnan(ds[VARin].values))):
+    ### create new variable that will be interpolated
+    if not np.all(np.isnan(ds[VARin].values)):
         VAR = ds[VARin].values
     else:
         print('   all NaNs in ' + VARin)
@@ -705,7 +704,7 @@ def interp_BGCArgo_var(ds, P, NEW_PRES, VARin, FORCE_ADJUSTED=False):
     i_allNaNs = []
     for it, tmp in enumerate(ds.JULD.values):  # loop through each date/profile
 
-        if "DOXY" in VARin:
+        if "DOXY" in VARin: # for now focus on DOXY because we work with respiration, but should be adapted to check also other variables
             # store position of where data are all NaNs
             if np.all(np.isnan(VAR[it, :])):
                 i_allNaNs.append(it)
@@ -734,6 +733,42 @@ def interp_BGCArgo_var(ds, P, NEW_PRES, VARin, FORCE_ADJUSTED=False):
         return da_VARi, i_allNaNs
     else:
         return da_VARi
+
+def apply_QC_flags(ds, QCmax=2):
+    '''Apply QC flags to all physical and BGC variables
+       Only accept data with QC <= QCmax
+       Will set to NaN all VAR and VAR_ADJUSTED values with QC > QCmax
+    '''
+
+    vars = ["PRES", "TEMP", "PSAL", "DOXY", "CHLA", "NITRATE", "BBP700", "PH_IN_SITU_TOTAL"]
+
+    for var in vars:
+
+        if var in ds.keys():
+            # create NaN mas from <VAR>_QC
+            QCmask = np.asarray(
+                [[float(value) for value in prof] for prof in ds[var + "_QC"].values])  # convert _QC to float
+            ds[var + "_QC"].values = QCmask
+            i2nan = np.where((QCmask > QCmax) & (QCmask != 8))[0]
+            QCmask[i2nan] = np.nan  # set QC > QCmax == NaN
+
+            # set VAR values to NaN if QC > QCmax and QC != [5, 8]
+            ds[var].values = ds[var].values * QCmask
+
+        # check if <VAR>_ADJUSTED exist and if so set <VAR>_ADJUSTED values to NaN if QC > QCmax and QC != [5, 8]
+        if var + "_ADJUSTED" in ds.keys():
+            # create NaN mas from <VAR>_ADJUSTED_QC
+            QCmask = np.asarray(
+                [[float(value) for value in prof] for prof in ds[var + "_ADJUSTED_QC"].values])  # convert _QC to float
+            ds[var + "_ADJUSTED_QC"].values = QCmask
+            i2nan = np.where((QCmask > QCmax) & (QCmask != 8))[0]
+            QCmask[i2nan] = np.nan  # set QC > QCmax == NaN
+
+            # set VAR_ADJUSTED values to NaN if QC > QCmax and QC != [5, 8]
+            ds[var + "_ADJUSTED"].values = ds[var + "_ADJUSTED"].values * QCmask
+
+    # return masked dataset
+    return ds
 
 
 if __name__ == '__main__':
