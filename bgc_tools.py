@@ -7,6 +7,7 @@ import sys
 from numba import jit
 import cartopy.crs as ccrs
 import statsmodels.api as sm
+import copy
 
 def cmp_sigma(ds):
     ''' 
