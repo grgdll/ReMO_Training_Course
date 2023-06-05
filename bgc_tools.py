@@ -749,30 +749,36 @@ def apply_QC_flags(ds, QCmax=2):
             ### create NaN mas from <VAR>_QC
             QCmask = np.asarray(
                 [[float(value) for value in prof] for prof in ds[var + "_QC"].values]
-            )  # convert _QC to float
+            )  # convert <VAR>_QC from string to float
             ds[var + "_QC"].values = QCmask
-            i2nan = np.where((QCmask > QCmax) & (QCmask != 8))[0]
             QCmask2 = copy.deepcopy(QCmask)
+            i2nan = np.where((QCmask > QCmax) & (QCmask != 8))[0]
             QCmask2[i2nan] = np.nan  # set QC > QCmax == NaN
+            igood = np.where((QCmask <= QCmax) & (QCmask == 8))[0]
+            QCmask2[igood] = 1.  # set QC <= QCmax = 1
 
             # set VAR values to NaN if QC > QCmax and QC != [5, 8]
             ds[var].values = ds[var].values * QCmask2
-            del QCmask, QCmask2
+            del QCmask
+            del QCmask2
 
         # check if <VAR>_ADJUSTED exist and if so set <VAR>_ADJUSTED values to NaN if QC > QCmax and QC != [5, 8]
         if var + "_ADJUSTED" in ds.keys():
-            ### create NaN mas from <VAR>_ADJUSTED_QC
+            ### create NaN mask from <VAR>_ADJUSTED_QC
             QCmask = np.asarray(
                 [[float(value) for value in prof] for prof in ds[var + "_ADJUSTED_QC"].values]
-            )  # convert _QC to float
+            )  # convert <VAR>_ADJUSTED_QC from string to float
             ds[var + "_ADJUSTED_QC"].values = QCmask
-            i2nan = np.where((QCmask > QCmax) & (QCmask != 8))[0]
             QCmask2 = copy.deepcopy(QCmask)
-            QCmask2[i2nan] = np.nan  # set QC > QCmax == NaN
+            i2nan = np.where((QCmask > QCmax) & (QCmask != 8))[0]
+            QCmask2[i2nan] = np.nan  # set QC > QCmax = NaN
+            igood = np.where((QCmask <= QCmax) | (QCmask == 8))[0]
+            QCmask2[igood] = 1.  # set QC <= QCmax = 1
 
             # set VAR values to NaN if QC > QCmax and QC != [5, 8]
-            ds[var + "_ADJUSTED_QC"].values = ds[var + "_ADJUSTED_QC"].values * QCmask2
-            del QCmask, QCmask2
+            ds[var + "_ADJUSTED"].values = ds[var + "_ADJUSTED"].values * QCmask2
+            del QCmask
+            del QCmask2
 
     # return masked dataset
     return ds
