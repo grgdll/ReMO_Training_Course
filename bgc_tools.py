@@ -680,13 +680,18 @@ def interp_BGCArgo_var(ds, P, NEW_PRES, VARin, FORCE_ADJUSTED=False):
     '''interpolate all profiles of BGCArgo variable from Sprof file to common pressure axis'''
 
     ### define if we must/can use the ADJUSTED variable
-    if FORCE_ADJUSTED:  # this is when we MUST have an adjusted variable
+    if FORCE_ADJUSTED == True:  # this is when we MUST have an adjusted variable
         VARin = VARin + "_ADJUSTED"
         print('using ADJUSTED values for ' + VARin)
 
-    elif (VARin + "_ADJUSTED" in ds.keys()) & ("BBP" not in VARin):  # this is when we see if we have the adjusted
-        VARin = VARin + "_ADJUSTED"
-        print('using ADJUSTED values for ' + VARin)
+    elif (FORCE_ADJUSTED == False) & (VARin + "_ADJUSTED" in ds.keys()) & ("BBP" not in VARin):  # this is when we see if we have the adjusted
+        # and here we check if there are non NaNs inside the _ADJUSTED variable
+        if ~np.all(np.isnan(ds[VARin + "_ADJUSTED"].values)):
+            VARin = VARin + "_ADJUSTED"
+            print('using ADJUSTED values for ' + VARin)
+        else:
+            print('using un-ADJUSTED values for ' + VARin)
+            
 
     else:  # this is when we do not have an adjusted variable, but we are OK to use the unadjusted
         print('using un-ADJUSTED values for ' + VARin)
