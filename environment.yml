@@ -4,6 +4,7 @@ channels:
   - nodefaults
 channel_priority: strict
 dependencies:
+  - python=3.10
   - cartopy=0.21.0
   - gsw=3.6.16
   - hvplot=0.8.2
