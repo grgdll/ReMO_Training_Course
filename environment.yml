@@ -1,9 +1,8 @@
 name: R_training 
 channels:
-  - pyviz
   - conda-forge
-  - https://repo.anaconda.com/pkgs/main/osx-arm64/
-  - defaults
+  - nodefaults
+channel_priority: strict
 dependencies:
   - cartopy=0.21.0
   - gsw=3.6.16
